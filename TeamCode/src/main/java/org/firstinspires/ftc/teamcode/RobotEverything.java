@@ -60,11 +60,11 @@ public class RobotEverything extends OpMode {
 
     double shooterStartTime = 9e99;
 
-    boolean runShooter = false;
+    char shooterDirection = 'F';
     // Tuning:
-    boolean IS_TUNING_ON = true;
+    boolean IS_TUNING_ON = false;
     double enabledShooterSpeed = 0.5;
-    double enabledIntakeSpeed = 0.2;
+    double enabledIntakeSpeed = 0.15;
     Gamepad previousGamepad = new Gamepad();
 
     // This declares the IMU needed to get the current direction the robot is facing
@@ -120,7 +120,7 @@ public class RobotEverything extends OpMode {
         telemetry.addLine("The left joystick sets the robot direction");
         telemetry.addLine("Moving the right joystick left and right turns the robot");
 
-        telemetry.addData("Shooter", runShooter ? "Enabled" : "Disabled");
+        telemetry.addData("Shooter direction", shooterDirection == 'F' ? "Forward" : "Reverse");
 
         if (IS_TUNING_ON) {
             telemetry.addLine("dpad up/down -> shooter speed +/-");
@@ -139,15 +139,30 @@ public class RobotEverything extends OpMode {
             shooterStartTime = runtime.milliseconds();
         }
 
-        if (gamepad1.right_trigger > 0.1 && previousGamepad.right_trigger <= 0.1) runShooter = !runShooter;
+        if (gamepad1.right_bumper) {
+            shooterDirection = 'R';
+            // Reverse
+        } else {
+            shooterDirection = 'F';
+        }
 
         double timeDiff = runtime.milliseconds() - shooterStartTime;
 
-        double intakeSpeed = timeDiff > 0 && timeDiff < 3500 ? enabledIntakeSpeed : 0.0;
-        double shooterSpeed = runShooter ? enabledShooterSpeed : 0.0;
-        intakeLeft.setPower(intakeSpeed);
-        intakeRight.setPower(intakeSpeed);
-        shooter.setPower(shooterSpeed);
+        if (shooterDirection == 'F') {
+            shooter.setPower(enabledShooterSpeed);
+        } else {
+            shooter.setPower(-enabledShooterSpeed); // Reverse shooter
+        }
+
+        if (shooterDirection == 'F') {
+            double intakeSpeed = timeDiff > 0 && timeDiff < 3500 ? enabledIntakeSpeed : 0.0;
+            intakeLeft.setPower(intakeSpeed);
+            intakeRight.setPower(intakeSpeed);
+        } else {
+            intakeLeft.setPower(-1);
+            intakeRight.setPower(-1);
+        }
+
 
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
