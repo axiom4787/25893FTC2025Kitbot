@@ -47,10 +47,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp(name = "Robot: Everything", group = "Robot")
 public class RobotEverything extends OpMode {
     // This declares the four motors needed
-    DcMotor frontLeftDrive;
-    DcMotor frontRightDrive;
-    DcMotor backLeftDrive;
-    DcMotor backRightDrive;
+    DcMotor frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive;
 
     DcMotor shooter;
     CRServo intakeLeft;
@@ -66,7 +63,7 @@ public class RobotEverything extends OpMode {
     double enabledShooterSpeed = 0.5;
     double enabledIntakeSpeed = 0.15;
     Gamepad previousGamepad = new Gamepad();
-
+    
     // This declares the IMU needed to get the current direction the robot is facing
     IMU imu;
 
@@ -86,7 +83,7 @@ public class RobotEverything extends OpMode {
         intakeRight.setDirection(DcMotor.Direction.FORWARD);
 
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        ;
         // We set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
         frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -150,19 +147,16 @@ public class RobotEverything extends OpMode {
 
         if (shooterDirection == 'F') {
             shooter.setPower(enabledShooterSpeed);
-        } else {
-            shooter.setPower(-enabledShooterSpeed); // Reverse shooter
-        }
 
-        if (shooterDirection == 'F') {
             double intakeSpeed = timeDiff > 0 && timeDiff < 3500 ? enabledIntakeSpeed : 0.0;
             intakeLeft.setPower(intakeSpeed);
             intakeRight.setPower(intakeSpeed);
         } else {
+            shooter.setPower(-0.2); // Reverse shooter
+
             intakeLeft.setPower(-1);
             intakeRight.setPower(-1);
         }
-
 
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
